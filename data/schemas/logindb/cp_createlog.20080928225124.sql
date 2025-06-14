@@ -6,8 +6,8 @@ CREATE TABLE `cp_createlog` (
   `sex` enum('M','F','S') NOT NULL default 'M',
   `email` varchar(39) NOT NULL,
   `reg_date` datetime NOT NULL default '0000-00-00 00:00:00',
-  `reg_ip` varchar(100) NOT NULL,
+  `reg_ip` varchar(39) NOT NULL,
   `delete_date` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `name` (`userid`)
-) ENGINE=MyISAM ;
+) ENGINE=MyISAM;
