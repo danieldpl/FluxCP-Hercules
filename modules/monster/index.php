@@ -11,12 +11,12 @@ try {
 	$tableName  = "{$server->charMapDatabase}.monsters";
 	$fromTables = array("{$server->charMapDatabase}.mob_db", "{$server->charMapDatabase}.mob_db2");
 	$tempTable  = new Flux_TemporaryTable($server->connection, $tableName, $fromTables);
-	
+
 	// Statement parameters, joins and conditions.
 	$bind        = array();
 	$sqlpartial  = "WHERE 1=1 ";
 	$monsterID   = $params->get('monster_id');
-	
+
 	if ($monsterID) {
 		$sqlpartial .= "AND monsters.ID = ? ";
 		$bind[]      = $monsterID;
@@ -29,9 +29,9 @@ try {
 		$race           = $params->get('race');
 		$element        = $params->get('element');
 		$cardID         = $params->get('card_id');
-		$mvp            = strtolower($params->get('mvp'));
+		$mvp            = strtolower($params->get('mvp') ?? '');
 		$custom         = $params->get('custom');
-		
+
 		if ($monsterName) {
 			$sqlpartial .= "AND ((kName LIKE ? OR kName = ?) OR (iName LIKE ? OR iName = ?)) ";
 			$bind[]      = "%$monsterName%";
@@ -48,19 +48,19 @@ try {
 					$bind[]      = $size;
 				}
 			} else {
-				$sizeName = preg_quote($size, '/');
+				$sizeName = preg_quote($size ?? '', '/');
 				$sizes = preg_grep("/.*?$sizeName.*?/i", Flux::config('MonsterSizes')->toArray());
-				
+
 				if (count($sizes)) {
 					$sizes = array_keys($sizes);
 					$sqlpartial .= "AND (";
 					$partial     = '';
-					
+
 					foreach ($sizes as $id) {
 						$partial .= "Scale = ? OR ";
 						$bind[]   = $id;
 					}
-					
+
 					$partial     = preg_replace('/\s*OR\s*$/', '', $partial);
 					$sqlpartial .= "$partial) ";
 				}
@@ -75,19 +75,19 @@ try {
 					$bind[]      = $race;
 				}
 			} else {
-				$raceName = preg_quote($race, '/');
+				$raceName = preg_quote($race ?? '', '/');
 				$races = preg_grep("/.*?$raceName.*?/i", Flux::config('MonsterRaces')->toArray());
-				
+
 				if (count($races)) {
 					$races = array_keys($races);
 					$sqlpartial .= "AND (";
 					$partial     = '';
-					
+
 					foreach ($races as $id) {
 						$partial .= "Race = ? OR ";
 						$bind[]   = $id;
 					}
-					
+
 					$partial     = preg_replace('/\s*OR\s*$/', '', $partial);
 					$sqlpartial .= "$partial) ";
 				}
@@ -107,7 +107,7 @@ try {
 				} else {
 					$sqlpartial .= 'AND Element IS NULL ';
 				}
-				
+
 				if (count($elementSplit) == 2 && is_numeric($elementLevel) && (floatval($elementLevel) == intval($elementLevel))) {
 					$sqlpartial .= "AND CAST(Element/20 AS UNSIGNED) = ? ";
 					$bind[]      = $elementLevel;
@@ -115,17 +115,17 @@ try {
 			} else {
 				$elementName = preg_quote($element, '/');
 				$elements    = preg_grep("/.*?$elementName.*?/i", Flux::config('Elements')->toArray());
-				
+
 				if (count($elements)) {
 					$elements    = array_keys($elements);
 					$sqlpartial .= "AND (";
 					$partial     = '';
-					
+
 					foreach ($elements as $id) {
 						$partial .= "Element%10 = ? OR ";
 						$bind[]   = $id;
 					}
-					
+
 					$partial     = preg_replace('/\s*OR\s*$/', '', $partial);
 					$sqlpartial .= "$partial) ";
 				} else {
@@ -133,19 +133,19 @@ try {
 				}
 			}
 		}
-		
+
 		if ($cardID) {
 			$sqlpartial .= "AND DropCardid = ? ";
 			$bind[]      = $cardID;
 		}
-		
+
 		if ($mvp == 'yes') {
 			$sqlpartial .= 'AND MEXP > 0 ';
 		}
 		elseif ($mvp == 'no') {
 			$sqlpartial .= 'AND MEXP = 0 ';
 		}
-		
+
 		if ($custom) {
 			if ($custom == 'yes') {
 				$sqlpartial .= "AND origin_table LIKE '%mob_db2' ";
@@ -155,28 +155,28 @@ try {
 			}
 		}
 	}
-	
+
 	// Get total count and feed back to the paginator.
 	$sth = $server->connection->getStatement("SELECT COUNT(monsters.ID) AS total FROM $tableName $sqlpartial");
 	$sth->execute($bind);
-	
+
 	$paginator = $this->getPaginator($sth->fetch()->total);
 	$paginator->setSortableColumns(array(
 		'monster_id' => 'asc', 'kro_name', 'iro_name', 'level', 'hp', 'size', 'race', 'exp', 'jexp', 'dropcard_id', 'origin_table'
 	));
-	
+
 	$col  = "origin_table, monsters.ID AS monster_id, kName AS kro_name, iName AS iro_name, ";
 	$col .= "LV AS level, HP AS hp, Scale as size, Race AS race, (Element%10) AS element_type, (Element/20) AS element_level, ";
 	$col .= "EXP AS exp, JEXP AS jexp, DropCardid AS dropcard_id, mexp AS mvp_exp";
-	
+
 	$sql  = $paginator->getSQL("SELECT $col FROM $tableName $sqlpartial");
 	$sth  = $server->connection->getStatement($sql);
-	
+
 	$sth->execute($bind);
 	$monsters = $sth->fetchAll();
-	
+
 	$authorized = $auth->actionAllowed('monster', 'view');
-	
+
 	if ($monsters && count($monsters) === 1 && $authorized && Flux::config('SingleMatchRedirectMobs')) {
 		$this->redirect($this->url('monster', 'view', array('id' => $monsters[0]->monster_id)));
 	}
@@ -186,7 +186,7 @@ catch (Exception $e) {
 		// Ensure table gets dropped.
 		$tempTable->drop();
 	}
-	
+
 	// Raise the original exception.
 	$class = get_class($e);
 	throw new $class($e->getMessage());

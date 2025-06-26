@@ -11,13 +11,13 @@
 	<table class="vertical-table">
 		<tr>
 			<th><label for="item_id">Item ID</label></th>
-			<td><input type="text" name="item_id" id="item_id" value="<?php echo htmlspecialchars($itemID) ?>" /></td>
+			<td><input type="text" name="item_id" id="item_id" value="<?php echo htmlspecialchars($itemID ?? '') ?>" /></td>
 			<th><label for="view">View ID</label></th>
-			<td><input type="text" name="view" id="view" value="<?php echo htmlspecialchars($viewID) ?>" /></td>
+			<td><input type="text" name="view" id="view" value="<?php echo htmlspecialchars($viewID ?? '') ?>" /></td>
 		</tr>
 		<tr>
 			<th><label for="name_english">Identifier</label></th>
-			<td><input type="text" name="name_english" id="name_english" value="<?php echo htmlspecialchars($identifier) ?>" /></td>
+			<td><input type="text" name="name_english" id="name_english" value="<?php echo htmlspecialchars($identifier ?? '') ?>" /></td>
 			<th><label for="type">Type</label></th>
 			<td>
 				<select name="type" id="type">
@@ -31,7 +31,7 @@
 		</tr>
 		<tr>
 			<th><label for="name_japanese">Name</label></th>
-			<td><input type="text" name="name_japanese" id="name_japanese" value="<?php echo htmlspecialchars($itemName) ?>" /></td>
+			<td><input type="text" name="name_japanese" id="name_japanese" value="<?php echo htmlspecialchars($itemName ?? '') ?>" /></td>
 			<th><label for="slots">Slots</label></th>
 			<td><input type="text" name="slots" id="slots" value="<?php echo htmlspecialchars($slots) ?>" /></td>
 		</tr>
