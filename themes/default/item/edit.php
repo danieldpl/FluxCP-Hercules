@@ -76,7 +76,7 @@
 			<th><label for="matk">MATK</label></th>
 			<td><input type="text" name="matk" id="matk" value="<?php echo htmlspecialchars($matk) ?>" /></td>
 			<th><label for="equip_level_max">Max Equip Level</label></th>
-			<td><input type="text" name="equip_level_max" id="equip_level_max" value="<?php echo htmlspecialchars($equipLevelMax) ?>" /></td>
+			<td><input type="text" name="equip_level_max" id="equip_level_max" value="<?php echo htmlspecialchars($equipLevelMax ?? '') ?>" /></td>
 		</tr>
 		<tr>
 			<th><label>Refineable</label></th>

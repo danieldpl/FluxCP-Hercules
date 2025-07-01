@@ -12,13 +12,13 @@ try {
 	$tableName = "{$server->charMapDatabase}.items";
 	$tempTable = new Flux_TemporaryTable($server->connection, $tableName, $fromTables);
 	$shopTable = Flux::config('FluxTables.ItemShopTable');
-	
+
 	// Statement parameters, joins and conditions.
 	$bind        = array();
 	$sqlpartial  = "LEFT OUTER JOIN {$server->charMapDatabase}.$shopTable ON $shopTable.nameid = items.id ";
 	$sqlpartial .= "WHERE 1=1 ";
 	$itemID      = $params->get('item_id');
-	
+
 	if ($itemID) {
 		$sqlpartial .= "AND items.id = ? ";
 		$bind[]      = $itemID;
@@ -48,7 +48,7 @@ try {
 		$refineable   = $params->get('refineable');
 		$forSale      = $params->get('for_sale');
 		$custom       = $params->get('custom');
-		
+
 		if ($itemName) {
 			$sqlpartial .= "AND (name_japanese LIKE ? OR name_japanese = ?) ";
 			$bind[]      = "%$itemName%";
@@ -68,7 +68,7 @@ try {
 				} else {
 					$sqlpartial .= 'AND type IS NULL ';
 				}
-				
+
 				if (count($itemTypeSplit) == 2 && is_numeric($itemType2) && (floatval($itemType2) == intval($itemType2))) {
 					$itemTypes2 = Flux::config('ItemTypes2')->toArray();
 					if (array_key_exists($itemType, $itemTypes2) && array_key_exists($itemType2, $itemTypes2[$itemType]) && $itemTypes2[$itemType][$itemType2]) {
@@ -81,17 +81,17 @@ try {
 			} else {
 				$typeName   = preg_quote($itemType, '/');
 				$itemTypes  = preg_grep("/.*?$typeName.*?/i", Flux::config('ItemTypes')->toArray());
-				
+
 				if (count($itemTypes)) {
 					$itemTypes   = array_keys($itemTypes);
 					$sqlpartial .= "AND (";
 					$partial     = '';
-					
+
 					foreach ($itemTypes as $id) {
 						$partial .= "type = ? OR ";
 						$bind[]   = $id;
 					}
-					
+
 					$partial     = preg_replace('/\s*OR\s*$/', '', $partial);
 					$sqlpartial .= "$partial) ";
 				} else {
@@ -112,14 +112,14 @@ try {
 					}
 				}
 			} else {
-				$combinationName = preg_quote($equipLocs, '/');
+				$combinationName = preg_quote($equipLocs ?? '', '/');
 				$equipLocationCombinations = preg_grep("/.*?$combinationName.*?/i", Flux::config('EquipLocationCombinations')->toArray());
-				
+
 				if (count($equipLocationCombinations)) {
 					$equipLocationCombinations = array_keys($equipLocationCombinations);
 					$sqlpartial .= "AND (";
 					$partial     = '';
-					
+
 					foreach ($equipLocationCombinations as $id) {
 						if ($id === 0) {
 							$partial .= "(equip_locations = 0 OR equip_locations IS NULL) OR ";
@@ -128,13 +128,13 @@ try {
 							$bind[]   = $id;
 						}
 					}
-					
+
 					$partial     = preg_replace('/\s*OR\s*$/', '', $partial);
 					$sqlpartial .= "$partial) ";
 				}
 			}
 		}
-		
+
 		if (in_array($npcBuyOp, $opValues) && trim($npcBuy) != '') {
 			$op = $opMapping[$npcBuyOp];
 			if ($op == '=' && $npcBuy === '0') {
@@ -145,7 +145,7 @@ try {
 				$bind[]      = $npcBuy;
 			}
 		}
-		
+
 		if (in_array($npcSellOp, $opValues) && trim($npcSell) != '') {
 			$op = $opMapping[$npcSellOp];
 			if ($op == '=' && $npcSell === '0') {
@@ -156,7 +156,7 @@ try {
 				$bind[]      = $npcSell;
 			}
 		}
-		
+
 		if (in_array($weightOp, $opValues) && trim($weight) != '') {
 			$op = $opMapping[$weightOp];
 			if ($op == '=' && $weight === '0') {
@@ -167,7 +167,7 @@ try {
 				$bind[]      = $weight;
 			}
 		}
-		
+
 		if (in_array($atkOp, $opValues) && trim($atk) != '') {
 			$op = $opMapping[$atkOp];
 			if ($op == '=' && $atk === '0') {
@@ -178,7 +178,7 @@ try {
 				$bind[]      = $atk;
 			}
 		}
-		
+
 		if (in_array($matkOp, $opValues) && trim($matk) != '') {
 			$op = $opMapping[$matkOp];
 			if ($op == '=' && $matk === '0') {
@@ -189,7 +189,7 @@ try {
 				$bind[]      = $matk;
 			}
 		}
-		
+
 		if (in_array($defenseOp, $opValues) && trim($defense) != '') {
 			$op = $opMapping[$defenseOp];
 			if ($op == '=' && $defense === '0') {
@@ -200,7 +200,7 @@ try {
 				$bind[]      = $defense;
 			}
 		}
-		
+
 		if (in_array($rangeOp, $opValues) && trim($range) != '') {
 			$op = $opMapping[$rangeOp];
 			if ($op == '=' && $range === '0') {
@@ -211,7 +211,7 @@ try {
 				$bind[]      = $range;
 			}
 		}
-		
+
 		if (in_array($slotsOp, $opValues) && trim($slots) != '') {
 			$op = $opMapping[$slotsOp];
 			if ($op == '=' && $slots === '0') {
@@ -222,7 +222,7 @@ try {
 				$bind[]      = $slots;
 			}
 		}
-		
+
 		if ($refineable) {
 			if ($refineable == 'yes') {
 				$sqlpartial .= "AND refineable > 0 ";
@@ -231,7 +231,7 @@ try {
 				$sqlpartial .= "AND IFNULL(refineable, 0) < 1 ";
 			}
 		}
-		
+
 		if ($forSale) {
 			if ($forSale == 'yes') {
 				$sqlpartial .= "AND $shopTable.cost > 0 ";
@@ -240,7 +240,7 @@ try {
 				$sqlpartial .= "AND IFNULL($shopTable.cost, 0) < 1 ";
 			}
 		}
-		
+
 		if ($custom) {
 			if ($custom == 'yes') {
 				$sqlpartial .= "AND origin_table LIKE '%item_db2' ";
@@ -250,31 +250,31 @@ try {
 			}
 		}
 	}
-	
+
 	// Get total count and feed back to the paginator.
 	$sth = $server->connection->getStatement("SELECT COUNT(DISTINCT items.id) AS total FROM $tableName $sqlpartial");
 	$sth->execute($bind);
-	
+
 	$paginator = $this->getPaginator($sth->fetch()->total);
 	$sortable = array(
 		'item_id' => 'asc', 'name', 'type', 'equip_locations', 'price_buy', 'price_sell', 'weight',
 		'atk', 'matk', 'defense', 'range', 'slots', 'refineable', 'cost', 'origin_table'
 	);
 	$paginator->setSortableColumns($sortable);
-	
+
 	$col  = "origin_table, items.id AS item_id, name_japanese AS name, type, ";
 	$col .= "IFNULL(equip_locations, 0) AS equip_locations, price_buy, weight/10 AS weight, ";
 	$col .= "defence AS defense, `range`, slots, refineable, cost, $shopTable.id AS shop_item_id, ";
 	$col .= "IFNULL(price_sell, FLOOR(price_buy/2)) AS price_sell, view_sprite as view, atk, matk";
-	
+
 	$sql  = $paginator->getSQL("SELECT $col FROM $tableName $sqlpartial GROUP BY items.id");
 	$sth  = $server->connection->getStatement($sql);
-	
+
 	$sth->execute($bind);
 	$items = $sth->fetchAll();
-	
+
 	$authorized = $auth->actionAllowed('item', 'view');
-	
+
 	if ($items && count($items) === 1 && $authorized && Flux::config('SingleMatchRedirectItem')) {
 		$this->redirect($this->url('item', 'view', array('id' => $items[0]->item_id)));
 	}
@@ -284,7 +284,7 @@ catch (Exception $e) {
 		// Ensure table gets dropped.
 		$tempTable->drop();
 	}
-	
+
 	// Raise the original exception.
 	$class = get_class($e);
 	throw new $class($e->getMessage());

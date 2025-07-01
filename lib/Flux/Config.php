@@ -15,7 +15,7 @@ class Flux_Config {
 	 * @var array
 	 */
 	private $configArr;
-	
+
 	/**
 	 * Default options for setter.
 	 *
@@ -23,7 +23,7 @@ class Flux_Config {
 	 * @var array
 	 */
 	private $defaultSetOptions = array('overwrite' => true, 'force' => true);
-	
+
 	/**
 	 * This is here for any developer's convenience, just in case he/she would
 	 * like to re-use this library without having to depend on the Flux_Error
@@ -37,7 +37,7 @@ class Flux_Config {
 	 * @var string
 	 */
 	private $exceptionClass = 'Flux_Error';
-	
+
 	/**
 	 * Construct a Flux_Config instance which acts as a more convenient
 	 * accessor to the specified configuration array.
@@ -49,7 +49,7 @@ class Flux_Config {
 	{
 		$this->configArr = &$configArr;
 	}
-	
+
 	/**
 	 * This is here... for no real GOOD reason, but should the need arise, at
 	 * least you aren't deprived of access to it.
@@ -61,7 +61,7 @@ class Flux_Config {
 	{
 		return $this->configArr;
 	}
-	
+
 	/**
 	 * Goes through each child in the array which is also an array, and returns
 	 * them collectively as an array of Flux_Config instances.
@@ -79,7 +79,7 @@ class Flux_Config {
 		}
 		return $children;
 	}
-	
+
 	/**
 	 * Get the value held by the specified key. If the value is an array it
 	 * will be returned as an instance of Flux_Config by default, unless
@@ -94,10 +94,10 @@ class Flux_Config {
 	 */
 	public function get($key, $configObjectIfArray = true)
 	{
-		$keys = explode('.', $key);
+		$keys = explode('.', $key ?? '');
 		$base = &$this->configArr;
 		$size = count($keys) - 1;
-		
+
 		for ($i = 0; $i < $size; ++$i) {
 			$currentKey = $keys[$i];
 			if (is_array($base) && array_key_exists($currentKey, $base)) {
@@ -108,7 +108,7 @@ class Flux_Config {
 				return null;
 			}
 		}
-		
+
 		$currentKey = $keys[$size];
 		if (array_key_exists($currentKey, $base)) {
 			$value = &$base[$currentKey];
@@ -130,7 +130,7 @@ class Flux_Config {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Set a key to hold the specified value. The format for specifying a key
 	 * is 100% identical to Flux_Config::get().
@@ -150,7 +150,7 @@ class Flux_Config {
 		$keys = explode('.', $key);
 		$base = &$this->configArr;
 		$size = count($keys) - 1;
-		
+
 		for ($i = 0; $i < $size; ++$i) {
 			$currentKey = $keys[$i];
 			if (is_array($base) && array_key_exists($currentKey, $base)) {
@@ -165,16 +165,16 @@ class Flux_Config {
 				return false;
 			}
 		}
-		
+
 		$currentKey = $keys[$size];
 		if (array_key_exists($currentKey, $base) && !$opts['overwrite']) {
 			return false;
 		}
-		
+
 		$base[$currentKey] = $value;
 		return $value;
 	}
-	
+
 	/**
 	 * Convenience method for raising an internal exception.
 	 *
@@ -186,7 +186,7 @@ class Flux_Config {
 		$exceptionClass = $this->exceptionClass;
 		throw new $exceptionClass($message);
 	}
-	
+
 	/**
 	 * Adds the ability to call set<ConfigDirective>(<Value>) as native methods.
 	 *
@@ -212,7 +212,7 @@ class Flux_Config {
 			return $this->set($m[1], $args[0], $options);
 		}
 	}
-	
+
 	/**
 	 *
 	 */

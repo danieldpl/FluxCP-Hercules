@@ -16,7 +16,7 @@
 				<td><p><?php echo htmlspecialchars(Flux::message('IpbanIpAddressInfo')) ?></p></td>
 			</tr>
 			<tr>
-				<th><label for="reason"><?php echo htmlspecialchars(Flux::message('IpbanReasonLabel')) ?></label></th>
+				<th><label for="reason"><?php echo htmlspecialchars(Flux::message('IpbanEditReasonLabel')) ?></label></th>
 				<td>
 					<textarea name="reason" id="reason" class="reason"><?php
 						echo htmlspecialchars(($reason=$params->get('reason')) ? $reason : $ipban->reason)

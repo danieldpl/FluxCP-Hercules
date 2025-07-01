@@ -35,7 +35,7 @@
 		<th>iRO Name</th>
 		<td><?php echo htmlspecialchars($monster->iro_name) ?></td>
 		<th>HP</th>
-		<td><?php echo number_format($monster->hp) ?></td>
+		<td><?php echo number_format($monster->hp ?? 0) ?></td>
 	</tr>
 	<tr>
 		<th>Size</th>
@@ -47,7 +47,7 @@
 			<?php endif ?>
 		</td>
 		<th>SP</th>
-		<td><?php echo number_format($monster->sp) ?></td>
+		<td><?php echo number_format($monster->sp ?? 0) ?></td>
 	</tr>
 	<tr>
 		<th>Race</th>
@@ -56,7 +56,7 @@
 				<?php echo htmlspecialchars($race) ?>
 			<?php else: ?>
 				<span class="not-applicable">Unknown</span>
-			<?php endif ?>	
+			<?php endif ?>
 		</td>
 		<th>Level</th>
 		<td><?php echo number_format($monster->level) ?></td>
@@ -99,7 +99,7 @@
 	</tr>
 	<tr>
 		<th>Delay Motion</th>
-		<td><?php echo number_format($monster->defense_motion) ?> ms</td>
+		<td><?php echo number_format($monster->defense_motion ?? 0) ?> ms</td>
 		<th>Vision Range</th>
 		<td><?php echo number_format($monster->range3) ?></td>
 	</tr>
@@ -204,7 +204,7 @@
 		<th>Target</th>
 		<th>Condition</th>
 		<th>Value</th>
-	</tr>	
+	</tr>
 	<?php foreach ($mobSkills as $skill): ?>
 	<tr>
 		<td><?php echo htmlspecialchars($skill->INFO) ?></td>
